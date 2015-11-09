@@ -1,13 +1,13 @@
-angular.module('foodly.meals', [])
+angular.module('foodly.barbers', [])
 
-.controller('MealController', function($scope, $location, $window,Meals, Order, Auth, Counter) {
+.controller('barberListController', function($scope, $location, $window, Barbers, Order, Auth, Counter, idTool) {
 
 
 	$scope.data = []; //meals available for purchase
 	$scope.meal = {}; //meal to add
 	$scope.order = {orders: []};
 	$scope.count = Counter;
-	
+
 	//this code block is used to generate random reviews for our product demo -
 	//unfortunately, more intuitive implementations will cause a digest overflow.
 	$scope.randReviews = [];
@@ -23,21 +23,28 @@ angular.module('foodly.meals', [])
 	var order = $window.localStorage.getItem('order') || JSON.stringify({orders: []})
 	$window.localStorage.setItem('order', order);
 	$scope.count =  Counter;
-	$scope.getMeals = function() {
-		Meals.getMeals()
+
+	$scope.fetchBarbers = function() {
+		Barbers.getBarbers()
 			.then(function(data) {
+				console.log('DATA from fetchBarbers', data);
 				$scope.data = data;
 			})
 			.catch(function(err) {
 				console.log(err);
 			});
 	};
-	$scope.getMeals(); // must be called for initial page load
+	$scope.fetchBarbers(); // fetch Barbers Data to populate barbers-list page
+
+	$scope.setId = function(id) {
+		idTool.setBarberId(id);
+		console.log('getBarberId', idTool.getBarberId());
+	}
 
 
 	$scope.addMeal = function() {
 		$scope.meal.url = angular.element( document.querySelector( '#preview' ) )[0].currentSrc
-		Meals.addMeal({meals: [$scope.meal], username: Auth.getUsername()})
+		Meals.addMeal({meals: [$scope.meal]})
 			.then(function() {
 				console.log($scope.meal.description, 'sent to server.');
 				$location.path('/'); //added successfully
@@ -69,3 +76,4 @@ angular.module('foodly.meals', [])
 	};
 
 })
+
